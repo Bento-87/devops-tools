@@ -74,6 +74,7 @@ _helm(){
 _minikube(){
     if [ $sudoOn ];
     then
+        echo "*********** Instalando Minikube *****************"
         # Link da documentação - https://minikube.sigs.k8s.io/docs/start/
         curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
         $sudoOn dpkg -i minikube_latest_amd64.deb
@@ -102,8 +103,8 @@ main(){
             _$param
         done
     else 
-    echo "Instalando as ferramentas: $*"
-        for param in $*;
+    echo "Instalando as ferramentas: $getPrameters"
+        for param in $getPrameters;
         do
             _$param
         done
@@ -137,10 +138,10 @@ then
         fi
     done
     getPrameters="$*"
-    echo "*********** Ferramentas a serem instaladas: $getPrameters *****************"
+    echo "Ferramentas a serem instaladas: $getPrameters"
 else
     getParameters="all"
-    echo "*********** Ferramentas a serem instaladas: ${parameters:0:-4} *****************"
+    echo "Ferramentas a serem instaladas: ${parameters:0:-4}"
 fi
 
-main $getParameters
+main 
