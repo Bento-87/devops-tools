@@ -113,11 +113,20 @@ _kind(){
     fi
 }
 
+_k9s(){
+    # Link da documentação - https://k9scli.io/topics/install/
+    echo "*********** Instalando Kind *****************"
+    wget https://github.com/derailed/k9s/releases/latest/download/k9s_Linux_x86_64.tar.gz
+    tar -xzvf k9s_Linux_x86_64.tar.gz
+    chmod +x ./k9s
+    $sudoOn mv ./k9s /usr/local/bin/k9s
+}
+
 main(){
     _container
     echo "*********** Atualizando dados para instalação *****************"
     $sudoOn apt-get -qq update
-    $sudoOn apt install unzip curl -y
+    $sudoOn apt install unzip curl wget -y
     export DEBIAN_FRONTEND=noninteractive
     # Create directory to download filess
     mkdir config
@@ -143,7 +152,7 @@ main(){
 }
 
 # ------------------------------ Main --------------------------------
-parameters="kubectl docker helm terraform awscli minikube microk8s podman kind all"
+parameters="kubectl docker helm terraform awscli minikube microk8s podman kind k9s all"
 
 echo "*********** Verificando parametros para instalação *****************"
 if [[ "$*" != "" ]];
