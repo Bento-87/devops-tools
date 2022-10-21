@@ -63,10 +63,10 @@ _helm(){
     # Link da documentação - https://helm.sh/docs/intro/install/
     echo "*********** Instalando Helm *****************"
     curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
-    sudo apt-get install apt-transport-https --yes
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
-    sudo apt-get update
-    sudo apt-get install helm
+    $sudoOn apt-get install apt-transport-https -y
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | $sudoOn tee /etc/apt/sources.list.d/helm-stable-debian.list
+    $sudoOn apt-get update
+    $sudoOn apt-get install helm -y
 }
 
 _minikube(){
@@ -80,6 +80,22 @@ _minikube(){
         echo "*********** Minikube in docker não configurado ainda *****************"
     fi
 
+}
+
+_microk8s(){
+    # Link da documentação - https://microk8s.io/
+    if [ $sudoOn ];
+    then
+        echo "*********** Instalando MicroK8s *****************"
+        $sudoOn snap install microk8s --classic
+    else 
+        echo "*********** MicroK8s in docker não configurado ainda *****************"
+    fi
+    }
+
+_podman(){
+    # Link da documentação - https://podman.io/getting-started/installation
+    $sudoOn apt-get -y install podman
 }
 
 main(){
@@ -112,7 +128,7 @@ main(){
 }
 
 # ------------------------------ Main --------------------------------
-parameters="kubectl docker helm terraform awscli minikube all"
+parameters="kubectl docker helm terraform awscli minikube microk8s podman all"
 
 echo "*********** Verificando parametros para instalação *****************"
 if [[ "$*" != "" ]];
