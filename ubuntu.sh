@@ -12,7 +12,7 @@ Container() {
 }
 
 _docker() {
-     if [ $sudoOn ];
+    if [ $sudoOn ];
     then
         echo "*********** Instalando Docker *****************"
         $sudoOn apt-get remove -y docker docker-engine docker.io containerd runc
@@ -71,10 +71,21 @@ _helm(){
     sudo apt-get install helm
     }
 
+_minikube(){
+    if [ $sudoOn ];
+    then
+        # Link da documentação - https://minikube.sigs.k8s.io/docs/start/
+        curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
+        $sudoOn dpkg -i minikube_latest_amd64.deb
+    else 
+        echo "*********** Minikube in docker não configurado ainda *****************"
+    fi
+
+}
+
 
 main(){
     Container
-    # echo "*********** OK !! Parametros informados $parameters *****************"
     echo "*********** Atualizando dados para instalação *****************"
     $sudoOn apt-get -qq update
     $sudoOn apt install unzip curl -y
@@ -104,7 +115,7 @@ main(){
 }
 
 # ------------------------------ Main --------------------------------
-parameters="kubectl docker helm terraform awscli all"
+parameters="kubectl docker helm terraform awscli minikube all"
 
 echo "*********** Verificando parametros para instalação *****************"
 if [[ "$*" != "" ]];
