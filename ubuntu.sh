@@ -88,6 +88,8 @@ _microk8s(){
     then
         echo "*********** Instalando MicroK8s *****************"
         $sudoOn snap install microk8s --classic
+        $sudoOn usermod -a -G microk8s $USER
+        $sudoOn chown -f -R $USER ~/.kube
     else 
         echo "*********** MicroK8s in docker não configurado ainda *****************"
     fi
