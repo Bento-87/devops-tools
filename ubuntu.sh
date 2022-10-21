@@ -1,5 +1,5 @@
 #!/bin/bash
-Container() {
+_container() {
     echo "*********** Verificando se está rodando em um container Ubuntu"
     if [ -f /.dockerenv ];
     then
@@ -30,7 +30,6 @@ _docker() {
     else 
         echo "*********** Docker in docker não configurado ainda *****************"
     fi
-
 }
 
 _terraform (){
@@ -49,7 +48,6 @@ _kubectl() {
         $sudoOn apt update && $sudoOn apt install kubectl -y
     else 
         echo "*********** Instalando Kubernetes(Container) *****************"
-        # Install kubectl
         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
     fi
 }
@@ -69,13 +67,13 @@ _helm(){
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
     sudo apt-get update
     sudo apt-get install helm
-    }
+}
 
 _minikube(){
+    # Link da documentação - https://minikube.sigs.k8s.io/docs/start/
     if [ $sudoOn ];
     then
         echo "*********** Instalando Minikube *****************"
-        # Link da documentação - https://minikube.sigs.k8s.io/docs/start/
         curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
         $sudoOn dpkg -i minikube_latest_amd64.deb
     else 
@@ -84,9 +82,8 @@ _minikube(){
 
 }
 
-
 main(){
-    Container
+    _container
     echo "*********** Atualizando dados para instalação *****************"
     $sudoOn apt-get -qq update
     $sudoOn apt install unzip curl -y
@@ -109,7 +106,6 @@ main(){
             _$param
         done
     fi
-
     # Deleting the directory
     cd ../
     $sudoOn rm -rf config
