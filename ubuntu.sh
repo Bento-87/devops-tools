@@ -93,11 +93,24 @@ _microk8s(){
     else 
         echo "*********** MicroK8s in docker não configurado ainda *****************"
     fi
-    }
+}
 
 _podman(){
     # Link da documentação - https://podman.io/getting-started/installation
     $sudoOn apt-get -y install podman
+}
+
+_kind(){
+    # Link da documentação - https://kind.sigs.k8s.io/docs/user/quick-start/#installing-with-a-package-manager
+    if [ $sudoOn ];
+    then
+        echo "*********** Instalando Kind *****************"
+        curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.16.0/kind-linux-amd64
+        chmod +x ./kind
+        $sudoOn mv ./kind /usr/local/bin/kind
+    else 
+        echo "*********** Kind in docker não configurado ainda *****************"
+    fi
 }
 
 main(){
@@ -130,7 +143,7 @@ main(){
 }
 
 # ------------------------------ Main --------------------------------
-parameters="kubectl docker helm terraform awscli minikube microk8s podman all"
+parameters="kubectl docker helm terraform awscli minikube microk8s podman kind all"
 
 echo "*********** Verificando parametros para instalação *****************"
 if [[ "$*" != "" ]];
