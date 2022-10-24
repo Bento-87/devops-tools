@@ -138,6 +138,8 @@ _crio(){
 
         $sudoOn apt-get update
         $sudoOn apt-get install cri-o cri-o-runc
+
+        $sudoOn systemctl enable crio
     else 
     echo "*********** CRIO in docker não configurado ainda *****************"
     fi
