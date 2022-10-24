@@ -115,7 +115,7 @@ _kind(){
 
 _k9s(){
     # Link da documentação - https://k9scli.io/topics/install/
-    echo "*********** Instalando Kind *****************"
+    echo "*********** Instalando k9s *****************"
     wget https://github.com/derailed/k9s/releases/latest/download/k9s_Linux_x86_64.tar.gz
     tar -xzvf k9s_Linux_x86_64.tar.gz
     chmod +x ./k9s
@@ -128,7 +128,7 @@ _crio(){
     then
         echo "*********** Instalando CRIO *****************"
         OS=xUbuntu_22.04
-        VERSION=3.14
+        VERSION=1.14
         echo "deb [signed-by=/usr/share/keyrings/libcontainers-archive-keyring.gpg] https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/ /" | $sudoOn tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
         echo "deb [signed-by=/usr/share/keyrings/libcontainers-crio-archive-keyring.gpg] https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/$VERSION/$OS/ /" |$sudoOn tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable:cri-o:$VERSION.list
 
@@ -164,6 +164,7 @@ main(){
     $sudoOn apt-get -qq update
     $sudoOn apt install unzip curl wget -y
     export DEBIAN_FRONTEND=noninteractive
+    export NEEDRESTART_MODE=a
     # Create directory to download filess
     mkdir config
     cd config
