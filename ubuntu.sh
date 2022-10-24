@@ -227,7 +227,7 @@ main(){
 }
 
 # ------------------------------ Main --------------------------------
-parameters="kubectl docker helm terraform awscli minikube microk8s podman kind k9s crio kubeadm _cridockerd all"
+parameters="kubectl docker helm terraform awscli minikube microk8s podman kind k9s crio kubeadm cridockerd all"
 
 echo "*********** Verificando parametros para instalação *****************"
 if [[ "$*" != "" ]];
