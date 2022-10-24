@@ -62,7 +62,7 @@ _awscli(){
 _helm(){
     # Link da documentação - https://helm.sh/docs/intro/install/
     echo "*********** Instalando Helm *****************"
-    curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
+    curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | $sudoOn tee /usr/share/keyrings/helm.gpg > /dev/null
     $sudoOn apt-get install apt-transport-https -y
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | $sudoOn tee /etc/apt/sources.list.d/helm-stable-debian.list
     $sudoOn apt-get update
@@ -122,6 +122,42 @@ _k9s(){
     $sudoOn mv ./k9s /usr/local/bin/k9s
 }
 
+_crio(){
+    # Link da documentação - https://github.com/cri-o/cri-o/blob/main/install.md
+    if [ $sudoOn ];
+    then
+        echo "*********** Instalando CRIO *****************"
+        OS=xUbuntu_22.04
+        VERSION=3.14
+        echo "deb [signed-by=/usr/share/keyrings/libcontainers-archive-keyring.gpg] https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/ /" | $sudoOn tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
+        echo "deb [signed-by=/usr/share/keyrings/libcontainers-crio-archive-keyring.gpg] https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/$VERSION/$OS/ /" |$sudoOn tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable:cri-o:$VERSION.list
+
+        mkdir -p /usr/share/keyrings
+        curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/Release.key | gpg --dearmor | $sudoOn tee /usr/share/keyrings/libcontainers-archive-keyring.gpg
+        curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/$VERSION/$OS/Release.key | gpg --dearmor |$sudoOn tee /usr/share/keyrings/libcontainers-crio-archive-keyring.gpg
+
+        $sudoOn apt-get update
+        $sudoOn apt-get install cri-o cri-o-runc
+    else 
+    echo "*********** CRIO in docker não configurado ainda *****************"
+    fi
+}
+
+_kubeadm(){
+    # Link da documentação - https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
+    if [ $sudoOn ];
+    then
+        echo "*********** Instalando Kubeadm *****************"
+        $sudoOn sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+        $sudoOn apt-get update
+        $sudoOn apt-get install -y kubelet kubeadm kubectl ebtables ethtool
+        $sudoOn apt-mark hold kubelet kubeadm kubectl
+    else 
+        echo "*********** Kubeadm in docker não configurado ainda *****************"
+    fi
+}
+
 main(){
     _container
     echo "*********** Atualizando dados para instalação *****************"
@@ -152,7 +188,7 @@ main(){
 }
 
 # ------------------------------ Main --------------------------------
-parameters="kubectl docker helm terraform awscli minikube microk8s podman kind k9s all"
+parameters="kubectl docker helm terraform awscli minikube microk8s podman kind k9s crio kubeadm all"
 
 echo "*********** Verificando parametros para instalação *****************"
 if [[ "$*" != "" ]];
