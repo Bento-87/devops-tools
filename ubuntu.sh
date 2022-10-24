@@ -7,7 +7,7 @@ _container() {
         sudoOn=""
     else
         echo "Nao estou em um container"
-        sudoOn="sudo"
+        sudoOn="DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a sudo"
     fi
 }
 
@@ -128,7 +128,7 @@ _crio(){
     then
         echo "*********** Instalando CRIO *****************"
         OS=xUbuntu_22.04
-        VERSION=1.14
+        VERSION=1.24
         echo "deb [signed-by=/usr/share/keyrings/libcontainers-archive-keyring.gpg] https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/ /" | $sudoOn tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
         echo "deb [signed-by=/usr/share/keyrings/libcontainers-crio-archive-keyring.gpg] https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/$VERSION/$OS/ /" |$sudoOn tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable:cri-o:$VERSION.list
 
