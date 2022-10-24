@@ -7,7 +7,7 @@ _container() {
         sudoOn=""
     else
         echo "Nao estou em um container"
-        sudoOn="DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a sudo"
+        sudoOn="sudo"
     fi
 }
 
