@@ -145,6 +145,42 @@ _crio(){
     fi
 }
 
+_cridockerd(){
+    # Link da documentação - https://github.com/Mirantis/cri-dockerd
+    if [ $sudoOn ];
+    then
+        echo "*********** Instalando cridockerd *****************"
+        git clone https://github.com/Mirantis/cri-dockerd.git
+        mkdir bin
+        VERSION=$((git describe --abbrev=0 --tags | sed -e 's/v//') || echo $(cat VERSION)-$(git log -1 --pretty='%h')) PRERELEASE=$(grep -q dev <<< "${VERSION}" && echo "pre" || echo "") REVISION=$(git log -1 --pretty='%h')
+        go build -ldflags="-X github.com/Mirantis/cri-dockerd/version.Version='$VERSION}' -X github.com/Mirantis/cri-dockerd/version.PreRelease='$PRERELEASE' -X github.com/Mirantis/cri-dockerd/version.BuildTime='$BUILD_DATE' -X github.com/Mirantis/cri-dockerd/version.GitCommit='$REVISION'" -o cri-dockerd
+
+        $sudoON wget https://storage.googleapis.com/golang/getgo/installer_linux
+        $sudoON chmod +x ./installer_linux
+        $sudoON ./installer_linux
+        $sudoON source ~/.bash_profile
+$sudoON 
+        $sudoON cd cri-dockerd
+        $sudoON mkdir bin
+        $sudoON go build -o bin/cri-dockerd
+        $sudoON mkdir -p /usr/local/bin
+        $sudoON install -o root -g root -m 0755 bin/cri-dockerd /usr/local/bin/cri-dockerd
+        $sudoON cp -a packaging/systemd/* /etc/systemd/system
+        $sudoON sed -i -e 's,/usr/bin/cri-dockerd,/usr/local/bin/cri-dockerd,' /etc/systemd/system/cri-docker.service
+        $sudoON systemctl daemon-reload
+        $sudoON systemctl enable cri-docker.service
+        $sudoON systemctl enable --now cri-docker.socket
+        
+        $sudoOn apt-get update
+        $sudoOn apt-get install cri-o cri-o-runc
+
+        $sudoOn systemctl enable crio
+        cd ../
+    else 
+    echo "*********** cridockerd in docker não configurado ainda *****************"
+    fi
+}
+
 _kubeadm(){
     # Link da documentação - https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
     if [ $sudoOn ];
@@ -191,7 +227,7 @@ main(){
 }
 
 # ------------------------------ Main --------------------------------
-parameters="kubectl docker helm terraform awscli minikube microk8s podman kind k9s crio kubeadm all"
+parameters="kubectl docker helm terraform awscli minikube microk8s podman kind k9s crio kubeadm _cridockerd all"
 
 echo "*********** Verificando parametros para instalação *****************"
 if [[ "$*" != "" ]];
