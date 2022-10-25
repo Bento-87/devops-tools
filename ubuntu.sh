@@ -15,15 +15,15 @@ _docker() {
     if [ $sudoOn ];
     then
         echo "*********** Instalando Docker *****************"
-        $sudoOn apt-get remove -y docker docker-engine docker.io containerd runc
-        $sudoOn apt-get install -y ca-certificates curl gnupg lsb-release
+        $sudoOn apt remove -y docker docker-engine docker.io containerd runc
+        $sudoOn apt install -y ca-certificates curl gnupg lsb-release
         $sudoOn mkdir -p /etc/apt/keyrings
         curl -fsSL https://download.docker.com/linux/ubuntu/gpg | $sudoOn gpg --dearmor -o /etc/apt/keyrings/docker.gpg
         echo \
         "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
         $(lsb_release -cs) stable" | $sudoOn tee /etc/apt/sources.list.d/docker.list > /dev/null
-        $sudoOn apt-get update
-        $sudoOn apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+        $sudoOn apt update
+        $sudoOn apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 
         $sudoOn groupadd docker
         $sudoOn usermod -aG docker $USER
@@ -36,7 +36,7 @@ _terraform (){
     echo "*********** Instalando Terraform *****************"
     wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | $sudoOn tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
     echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | $sudoOn tee /etc/apt/sources.list.d/hashicorp.list
-    $sudoOn apt-get update && $sudoOn apt-get install terraform -y
+    $sudoOn apt update && $sudoOn apt install terraform -y
 }
 
 _kubectl() {
@@ -45,7 +45,7 @@ _kubectl() {
         echo "*********** Instalando Kubectl *****************"
         $sudoOn curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
         echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | $sudoOn tee /etc/apt/sources.list.d/kubernetes.list
-        $sudoOn apt-get update && $sudoOn apt-get install kubectl -y
+        $sudoOn apt update && $sudoOn apt install kubectl -y
     else 
         echo "*********** Instalando Kubernetes(Container) *****************"
         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
@@ -63,10 +63,10 @@ _helm(){
     # Link da documentação - https://helm.sh/docs/intro/install/
     echo "*********** Instalando Helm *****************"
     curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | $sudoOn tee /usr/share/keyrings/helm.gpg > /dev/null
-    $sudoOn apt-get install apt-transport-https -y
+    $sudoOn apt install apt-transport-https -y
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | $sudoOn tee /etc/apt/sources.list.d/helm-stable-debian.list
-    $sudoOn apt-get update
-    $sudoOn apt-get install helm -y
+    $sudoOn apt update
+    $sudoOn apt install helm -y
 }
 
 _minikube(){
@@ -97,7 +97,7 @@ _microk8s(){
 
 _podman(){
     # Link da documentação - https://podman.io/getting-started/installation
-    $sudoOn apt-get -y install podman
+    $sudoOn apt -y install podman
 }
 
 _kind(){
@@ -136,8 +136,8 @@ _crio(){
         curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/Release.key | gpg --dearmor | $sudoOn tee /usr/share/keyrings/libcontainers-archive-keyring.gpg
         curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/$VERSION/$OS/Release.key | gpg --dearmor |$sudoOn tee /usr/share/keyrings/libcontainers-crio-archive-keyring.gpg
 
-        $sudoOn apt-get update
-        $sudoOn apt-get install -y cri-o cri-o-runc
+        $sudoOn apt update
+        $sudoOn apt install -y cri-o cri-o-runc
 
         $sudoOn systemctl enable crio
     else 
@@ -150,13 +150,13 @@ _cridockerd(){
     if [ $sudoOn ];
     then
         echo "*********** Instalando cridockerd *****************"
-        $sudoON apt-get install -y golang-go 
+        $sudoOn apt install -y golang-go 
 
         git clone https://github.com/Mirantis/cri-dockerd.git
     
         cd cri-dockerd
         mkdir bin
-        go build -o ./bin/cri-dockerd
+        go build -o bin/cri-dockerd
         $sudoOn mkdir -p /usr/local/bin
         $sudoOn install -o root -g root -m 0755 bin/cri-dockerd /usr/local/bin/cri-dockerd
         $sudoOn cp -a packaging/systemd/* /etc/systemd/system
@@ -175,10 +175,10 @@ _kubeadm(){
     if [ $sudoOn ];
     then
         echo "*********** Instalando Kubeadm *****************"
-        $sudoOn sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
-        echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
-        $sudoOn apt-get update
-        $sudoOn apt-get install -y kubelet kubeadm kubectl ebtables ethtool
+        $sudoOn curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | $sudoOn tee /etc/apt/sources.list.d/kubernetes.list
+        $sudoOn apt update
+        $sudoOn apt install -y kubelet kubeadm kubectl ebtables ethtool
         $sudoOn apt-mark hold kubelet kubeadm kubectl
     else 
         echo "*********** Kubeadm in docker não configurado ainda *****************"
