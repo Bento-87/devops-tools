@@ -22,8 +22,8 @@ _docker() {
         echo \
         "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
         $(lsb_release -cs) stable" | $sudoOn tee /etc/apt/sources.list.d/docker.list > /dev/null
-        $sudoOn apt update
-        $sudoOn apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+        $sudoOn apt-get update
+        $sudoOn apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 
         $sudoOn groupadd docker
         $sudoOn usermod -aG docker $USER
@@ -36,7 +36,7 @@ _terraform (){
     echo "*********** Instalando Terraform *****************"
     wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | $sudoOn tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
     echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | $sudoOn tee /etc/apt/sources.list.d/hashicorp.list
-    $sudoOn apt update && $sudoOn apt install terraform -y
+    $sudoOn apt-get update && $sudoOn apt-get install terraform -y
 }
 
 _kubectl() {
@@ -45,7 +45,7 @@ _kubectl() {
         echo "*********** Instalando Kubectl *****************"
         $sudoOn curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
         echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | $sudoOn tee /etc/apt/sources.list.d/kubernetes.list
-        $sudoOn apt update && $sudoOn apt install kubectl -y
+        $sudoOn apt-get update && $sudoOn apt-get install kubectl -y
     else 
         echo "*********** Instalando Kubernetes(Container) *****************"
         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
@@ -150,13 +150,13 @@ _cridockerd(){
     if [ $sudoOn ];
     then
         echo "*********** Instalando cridockerd *****************"
-        $sudoON apt install -y golang-go 
+        $sudoON apt-get install -y golang-go 
 
         git clone https://github.com/Mirantis/cri-dockerd.git
     
         cd cri-dockerd
         mkdir bin
-        go build -o bin/cri-dockerd
+        go build -o ./bin/cri-dockerd
         $sudoOn mkdir -p /usr/local/bin
         $sudoOn install -o root -g root -m 0755 bin/cri-dockerd /usr/local/bin/cri-dockerd
         $sudoOn cp -a packaging/systemd/* /etc/systemd/system
