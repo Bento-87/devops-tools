@@ -137,7 +137,7 @@ _crio(){
         curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/$VERSION/$OS/Release.key | gpg --dearmor |$sudoOn tee /usr/share/keyrings/libcontainers-crio-archive-keyring.gpg
 
         $sudoOn apt-get update
-        $sudoOn apt-get install cri-o cri-o-runc
+        $sudoOn apt-get install -y cri-o cri-o-runc
 
         $sudoOn systemctl enable crio
     else 
@@ -150,7 +150,7 @@ _cridockerd(){
     if [ $sudoOn ];
     then
         echo "*********** Instalando cridockerd *****************"
-        $sudoON apt install golang-go
+        $sudoON apt install -y golang-go 
 
         git clone https://github.com/Mirantis/cri-dockerd.git
     
