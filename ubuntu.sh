@@ -116,8 +116,9 @@ _kind(){
 _k9s(){
     # Link da documentação - https://k9scli.io/topics/install/
     echo "*********** Instalando k9s *****************"
-    wget https://github.com/derailed/k9s/releases/latest/download/k9s_Linux_x86_64.tar.gz
-    tar -xzvf k9s_Linux_x86_64.tar.gz
+    filename="k9s_Linux_amd64.tar.gz"
+    wget https://github.com/derailed/k9s/releases/latest/download/$filename
+    tar -xzvf $filename
     chmod +x ./k9s
     $sudoOn mv ./k9s /usr/local/bin/k9s
 }
