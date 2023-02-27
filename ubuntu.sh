@@ -16,7 +16,7 @@ _docker() {
     then
         echo "*********** Instalando Docker *****************"
         $sudoOn apt remove -y docker docker-engine docker.io containerd runc
-        $sudoOn apt install -y ca-certificates curl gnupg lsb-release
+        $sudoOn apt install -y gnupg lsb-release
         $sudoOn mkdir -p /etc/apt/keyrings
         curl -fsSL https://download.docker.com/linux/ubuntu/gpg | $sudoOn gpg --dearmor -o /etc/apt/keyrings/docker.gpg
         echo \
@@ -43,8 +43,8 @@ _kubectl() {
     if [ $sudoOn ];
     then
         echo "*********** Instalando Kubectl *****************"
-        $sudoOn curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
-        echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | $sudoOn tee /etc/apt/sources.list.d/kubernetes.list
+        $sudoOn  curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
         $sudoOn apt update && $sudoOn apt install kubectl -y
     else 
         echo "*********** Instalando Kubernetes(Container) *****************"
@@ -190,7 +190,7 @@ main(){
     _container
     echo "*********** Atualizando dados para instalação *****************"
     $sudoOn apt-get -qq update
-    $sudoOn apt install unzip curl wget -y
+    $sudoOn apt install ca-certificates unzip curl wget -y
     export DEBIAN_FRONTEND=noninteractive
     export NEEDRESTART_MODE=a
     # Create directory to download filess
