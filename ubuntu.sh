@@ -157,7 +157,7 @@ _cridockerd(){
     
         cd cri-dockerd
         mkdir bin
-        go build -o bin/cri-dockerd
+        go build -buildvcs=false -o bin/cri-dockerd
         $sudoOn mkdir -p /usr/local/bin
         $sudoOn install -o root -g root -m 0755 bin/cri-dockerd /usr/local/bin/cri-dockerd
         $sudoOn cp -a packaging/systemd/* /etc/systemd/system
@@ -176,8 +176,8 @@ _kubeadm(){
     if [ $sudoOn ];
     then
         echo "*********** Instalando Kubeadm *****************"
-        $sudoOn curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
-        echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | $sudoOn tee /etc/apt/sources.list.d/kubernetes.list
+        curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | $sudoOn gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg
+        echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | $sudoOn tee /etc/apt/sources.list.d/kubernetes.list
         $sudoOn apt update
         $sudoOn apt install -y kubelet kubeadm kubectl ebtables ethtool
         $sudoOn apt-mark hold kubelet kubeadm kubectl
