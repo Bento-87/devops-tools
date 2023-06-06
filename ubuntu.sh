@@ -164,6 +164,7 @@ _cridockerd(){
         $sudoOn sed -i -e 's,/usr/bin/cri-dockerd,/usr/local/bin/cri-dockerd,' /etc/systemd/system/cri-docker.service
         $sudoOn systemctl daemon-reload
         $sudoOn systemctl enable cri-docker.service
+        $sudoOn systemctl enable --now cri-docker.socket
         
         cd ../
     else 
