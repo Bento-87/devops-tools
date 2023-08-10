@@ -20,7 +20,7 @@ _docker() {
         $sudoOn mkdir -p /etc/apt/keyrings
         curl -fsSL https://download.docker.com/linux/ubuntu/gpg | $sudoOn gpg --dearmor -o /etc/apt/trusted.gpg.d/docker.gpg
         echo \
-        "deb [arch=$(dpkg --print-architecture) https://download.docker.com/linux/ubuntu \
+        "deb [arch=$(dpkg --print-architecture)] https://download.docker.com/linux/ubuntu \
         $(lsb_release -cs) stable" | $sudoOn tee /etc/apt/sources.list.d/docker.list > /dev/null
         $sudoOn apt update
         $sudoOn apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
