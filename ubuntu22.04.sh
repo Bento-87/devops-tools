@@ -1,4 +1,6 @@
 #!/bin/bash
+HELM_VERSION=3.15.4
+KIND_VERSION=v0.24.0
 _container() {
     echo "*********** Verificando se está rodando em um container Ubuntu"
     if [ -f /.dockerenv ];
@@ -40,16 +42,8 @@ _terraform (){
 }
 
 _kubectl() {
-    if [ $sudoOn ];
-    then
-        echo "*********** Instalando Kubectl *****************"
-        $sudoOn  curl -fsSLo etc/apt/trusted.gpg.d/kubernetes.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
-        echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
-        $sudoOn apt update && $sudoOn apt install kubectl -y
-    else 
-        echo "*********** Instalando Kubernetes(Container) *****************"
-        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-    fi
+    echo "*********** Instalando Kubernetes Binary *****************"
+    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && $sudoOn install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 }
 
 _awscli(){
@@ -61,12 +55,9 @@ _awscli(){
 
 _helm(){
     # Link da documentação - https://helm.sh/docs/intro/install/
-    echo "*********** Instalando Helm *****************"
-    curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | $sudoOn tee etc/apt/trusted.gpg.d/helm-stable-debian.gpg > /dev/null
-    $sudoOn apt install apt-transport-https -y
-    echo "deb [arch=$(dpkg --print-architecture)] https://baltocdn.com/helm/stable/debian/ all main" | $sudoOn tee /etc/apt/sources.list.d/helm-stable-debian.list
-    $sudoOn apt update
-    $sudoOn apt install helm -y
+    wget https://get.helm.sh/helm-v$HELM_VERSION-linux-amd64.tar.gz && \
+    tar -xzvf helm-v$HELM_VERSION-linux-amd64.tar.gz && \
+    $sudoOn mv linux-amd64/helm /usr/local/bin
 }
 
 _minikube(){
@@ -79,7 +70,6 @@ _minikube(){
     else 
         echo "*********** Minikube in docker não configurado ainda *****************"
     fi
-
 }
 
 _microk8s(){
@@ -105,7 +95,7 @@ _kind(){
     if [ $sudoOn ];
     then
         echo "*********** Instalando Kind *****************"
-        curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.16.0/kind-linux-amd64
+        curl -Lo ./kind https://kind.sigs.k8s.io/dl/$KIND_VERSION/kind-linux-amd64
         chmod +x ./kind
         $sudoOn mv ./kind /usr/local/bin/kind
     else 
@@ -121,70 +111,6 @@ _k9s(){
     tar -xzvf $filename
     chmod +x ./k9s
     $sudoOn mv ./k9s /usr/local/bin/k9s
-}
-
-_crio(){
-    # Link da documentação - https://github.com/cri-o/cri-o/blob/main/install.md
-    if [ $sudoOn ];
-    then
-        echo "*********** Instalando CRIO *****************"
-        OS=xUbuntu_22.04
-        VERSION=1.24
-        echo "deb [signed-by=/usr/share/keyrings/libcontainers-archive-keyring.gpg] https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/ /" | $sudoOn tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
-        echo "deb [signed-by=/usr/share/keyrings/libcontainers-crio-archive-keyring.gpg] https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/$VERSION/$OS/ /" |$sudoOn tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable:cri-o:$VERSION.list
-
-        mkdir -p /usr/share/keyrings
-        curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/Release.key | gpg --dearmor | $sudoOn tee /usr/share/keyrings/libcontainers-archive-keyring.gpg
-        curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/$VERSION/$OS/Release.key | gpg --dearmor |$sudoOn tee /usr/share/keyrings/libcontainers-crio-archive-keyring.gpg
-
-        $sudoOn apt update
-        $sudoOn apt install -y cri-o cri-o-runc
-
-        $sudoOn systemctl enable crio
-    else 
-    echo "*********** CRIO in docker não configurado ainda *****************"
-    fi
-}
-
-_cridockerd(){
-    # Link da documentação - https://github.com/Mirantis/cri-dockerd
-    if [ $sudoOn ];
-    then
-        echo "*********** Instalando cridockerd *****************"
-        $sudoOn apt install -y golang-go 
-
-        git clone https://github.com/Mirantis/cri-dockerd.git
-    
-        cd cri-dockerd
-        mkdir bin
-        go build -buildvcs=false -o bin/cri-dockerd
-        $sudoOn mkdir -p /usr/local/bin
-        $sudoOn install -o root -g root -m 0755 bin/cri-dockerd /usr/local/bin/cri-dockerd
-        $sudoOn cp -a packaging/systemd/* /etc/systemd/system
-        $sudoOn sed -i -e 's,/usr/bin/cri-dockerd,/usr/local/bin/cri-dockerd,' /etc/systemd/system/cri-docker.service
-        $sudoOn systemctl daemon-reload
-        $sudoOn systemctl enable cri-docker.service
-        $sudoOn systemctl enable --now cri-docker.socket
-        
-        cd ../
-    else 
-    echo "*********** cridockerd in docker não configurado ainda *****************"
-    fi
-}
-
-_kubeadm(){
-    # Link da documentação - https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
-    if [ $sudoOn ];
-    then
-        echo "*********** Instalando Kubeadm *****************"
-        $sudoOn  curl -fsSLo etc/apt/trusted.gpg.d/kubernetes.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
-        echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
-        $sudoOn apt update
-        $sudoOn apt install -y kubelet kubeadm kubectl ebtables ethtool
-        $sudoOn apt-mark hold kubelet kubeadm kubectl
-    else 
-        echo "*********** Kubeadm in docker não configurado ainda *****************"
-    fi
 }
 
 main(){
@@ -218,7 +144,7 @@ main(){
 }
 
 # ------------------------------ Main --------------------------------
-parameters="kubectl docker helm terraform awscli minikube microk8s podman kind k9s crio kubeadm cridockerd all"
+parameters="kubectl docker helm terraform awscli minikube microk8s podman kind k9s all"
 
 echo "*********** Verificando parametros para instalação *****************"
 if [[ "$*" != "" ]];
